@@ -1,4 +1,4 @@
-# AS tulkki – tiedonsiirto 0.7.1
+# AS tulkki – tiedonsiirto 0.7.2
 
 WordPress-lisäosa AS2026:n ja AS tulkin väliseen tiedonsiirtoon. Lisäosa käyttää WordPressin nykyistä MySQL-/MariaDB-tietokantaa omilla `as_tulkki_`-tauluillaan ja WordPressin määrittämällä tauluetuliitteellä. Muun autosuunnistussovelluksen tauluja ei muuteta.
 
@@ -6,7 +6,7 @@ WordPress-lisäosa AS2026:n ja AS tulkin väliseen tiedonsiirtoon. Lisäosa käy
 
 ## Asennus ja päivitys
 
-1. WordPress → Lisäosat → Lisää uusi lisäosa → Lataa lisäosa. Valitse `as-tulkki-yhteys-0.7.1.zip`.
+1. WordPress → Lisäosat → Lisää uusi lisäosa → Lataa lisäosa. Valitse `as-tulkki-yhteys-0.7.2.zip`.
 2. Jos aiempi versio on asennettu, hyväksy sen korvaaminen uudella versiolla. Älä poista kilpailuaineistoa. Aktivoi lisäosa tarvittaessa.
 3. Lisäosan omiin asetuksiin ei syötetä mitään. Aiempi AS tulkki -hallintavalikko poistuu; vanhat kilpailut ja tulkinnat säilyvät. Tietokantarakenne päivittyy automaattisesti.
 
@@ -14,7 +14,11 @@ Tarvitaan PHP 8.1+, WordPress 6.5+, HTTPS ja InnoDB. Verkkotason multisite-aktiv
 
 AS2026:n yhteysnäkymä hoitaa sivuston osoitteen, kilpailun luonnin, kilpailutiedot ja liittymiskoodin näyttämisen. AS2026:ssa voidaan avata ja sulkea puhelinyhteys sekä vaihtaa liittymiskoodi. Hallinta vaatii ylläpitäjän sovellussalasanan; toiminnot katkaisevat puhelinistunnot ja tarkastajat liittyvät uudelleen. Kilpailun tietoja ei syötetä kahteen paikkaan.
 
-## Uutta versiossa 0.7.1
+## Uutta versiossa 0.7.2
+
+ULA-ajan voi antaa muodossa 1845 tai 18:45. Muut virhepisteet kirjataan 100 vp:n askelin. Käytä AS2026-versiota 0.7.8 tai uudempaa suorien pisteiden vastaanottoon.
+
+## Versiossa 0.7.1 toteutettu
 
 ULA voidaan lisätä JAT:n jälkeen julkaistuun riviin säilyttäen vanhat aika-asemat, jaksot ja kirjaukset. Puuttuva uusi käsin syötettävä ULA-aika ilmoitetaan muutossyötteen pendingTimeIds-luettelossa. Se ei ole puuttuva korttimerkintä eikä tuota virhepisteitä. Nykyversion uusi tulkkaus vaatii edelleen kaikki käsin syötettävät ajat tai todelliset puuttumismerkinnät. Vanhan version lähetys validoidaan alkuperäisellä rivillä ja sovitetaan nykyiseen; vain lisätty ULA-aika voi jäädä täydennettäväksi.
 
@@ -114,7 +118,7 @@ Katso `examples/interpretation.json`. `revision` on noudetun kilpailutiedon vers
 
 `missingEntryIds` sisältää puuttuvien asemien esiintymätunnisteet. `times` on olio `{ "aseman-id": "12:34:03" }`. Käytä tyhjänä `{}`. Puuttuvan aseman aikaa ei lähetetä. Myös automaattisen aikarivin merkinnän voi merkitä puuttuvaksi, mutta sille ei voi syöttää aikaa käsin. Mitätöityä asemaa ei lähetetä puuttuvana eikä sille kirjata aikaa.
 
-Jokainen lähetetty jakso on **koko jakson korvaava valmis tulkinta**, ei yksittäisten kenttien päivitys. Pois jätetyt jaksot säilyvät. `otherErrors` on tarkistajan kirjaama muiden virheiden määrä, oletus 0; `note` on huomautus. Palvelin laskee erikseen `missingSigns`- ja `missingTimes`-määrät. Puuttuvat aikamerkinnät välitetään AS2026:lle, joka soveltaa pisteytyssääntöjä; asiakkaan ei pidä lisätä niitä uudelleen `otherErrors`-kenttään.
+Jokainen lähetetty jakso on **koko jakson korvaava valmis tulkinta**, ei yksittäisten kenttien päivitys. Pois jätetyt jaksot säilyvät. `otherErrors` on tarkistajan kirjaama muiden virheiden määrä, oletus 0. `otherPenaltyPoints` on 0–6000000 vp sadan pisteen askelin. Kun suorat pisteet annetaan, `otherErrors` on 0. Vastaanottava AS2026 ilmoittaa tuen otsakkeella `X-AS-Other-Penalty-Points: 1`. `note` on huomautus. Palvelin laskee erikseen `missingSigns`- ja `missingTimes`-määrät. Puuttuvat aikamerkinnät välitetään AS2026:lle, joka soveltaa pisteytyssääntöjä; asiakkaan ei pidä lisätä niitä uudelleen `otherErrors`-kenttään.
 
 Jokaisella Valmis-painalluksen muodostamalla lähetyksellä on uusi, satunnainen `requestId` (esimerkiksi UUID). **Tallenna lähetys paikallisesti ennen verkkopyyntöä. Yhteyskatkossa lähetä sama sisältö samalla requestId:llä**, kunnes saat kuittauksen. Sama tunniste ja sisältö palauttaa alkuperäisen `eventId`:n eikä korvaa mahdollista uudempaa korjausta. Sama tunniste eri sisällöllä saa HTTP 409:n. Näin vanha verkkoyritys ei muutu uudeksi käyttäjän korjaukseksi.
 
@@ -122,7 +126,7 @@ Vastaus on `{"eventId":123,"replayed":false}` (HTTP 201) tai uusinnalle `replaye
 
 ### Muutosten nouto ja reaaliaikaisuus
 
-AS2026 hakee muutoksia noin 5 sekuntia edellisen haun valmistumisesta. Puhelimen selainversio päivittää tiedot ja yrittää jonossa olevia lähetyksiä 10 sekunnin välein. Lisäosa ei tarvitse erillistä WebSocket-palvelinta. Verkkoyhteys ja palvelimen kuormitus vaikuttavat viiveeseen.
+AS2026 hakee muutoksia noin 15 sekuntia edellisen haun valmistumisesta. Puhelimen selainversio päivittää tiedot ja yrittää jonossa olevia lähetyksiä 10 sekunnin välein. Lisäosa ei tarvitse erillistä WebSocket-palvelinta. Verkkoyhteys ja palvelimen kuormitus vaikuttavat viiveeseen.
 
 Vastaus sisältää `events`, `nextCursor`, `hasMore`. Alussa `after=0`. Tapahtumissa on `eventId`, `pairNumber`, `sections`, `reviewer`, `savedAt` ja `revision`. Enintään 100 tapahtumaa per sivu. Kun `hasMore=true`, hae seuraava sivu heti. **Tallenna kohdistin vasta, kun kaikki sivun tapahtumat on käsitelty onnistuneesti.** Käsittele tapahtumat numerojärjestyksessä ja korvaa kyseisen parin kyseiset jaksot kokonaan. Samalla tapahtumalla ei saa tuplata virhemääriä.
 
@@ -154,7 +158,7 @@ AS2026:n Kilvet → AS tulkki -ikkunassa näkyy julkaisemisen jälkeen Näytä l
 
 
 ## Ajan syöttö
-Aikakenttään voi kirjoittaa 180334 tai 18:03:34. Kentästä poistuttaessa kelvollinen kuuden numeron aika muotoillaan kaksoispisteillä. Myös Valmis-painike toimii suoraan aktiivisesta viimeisestä aikakentästä. Keskeneräistä tai virheellistä aikaa ei hyväksytä.
+ULA-kenttään voi kirjoittaa 1845 tai 18:45. Muissa aikakentissä muodot ovat 180334 ja 18:03:34. Rajapinta käyttää muotoa hh:mm:ss. Kentästä poistuttaessa kelvollinen kuuden numeron aika muotoillaan kaksoispisteillä. Myös Valmis-painike toimii suoraan aktiivisesta viimeisestä aikakentästä. Keskeneräistä tai virheellistä aikaa ei hyväksytä.
 
 
 ## GitHub-repositorion sisältö

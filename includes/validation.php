@@ -238,10 +238,19 @@ final class AS_Tulkki_Data {
                 if (!isset($known[$id])) { throw new InvalidArgumentException('Tuntematon aseman tunniste.'); }
             }
             foreach ($times as $time) { if ($time === null) { throw new InvalidArgumentException('Aika ei saa olla null.'); } }
-            $sections[] = ['id'=>$sid, 'missingEntryIds'=>$missing, 'times'=>(object)$times,
+            $other_errors = self::integer($raw['otherErrors'] ?? 0, 0, 10000);
+            $section_result = ['id'=>$sid, 'missingEntryIds'=>$missing, 'times'=>(object)$times,
                 'note'=>self::text($raw['note'] ?? '', 4000),
-                'otherErrors'=>self::integer($raw['otherErrors'] ?? 0, 0, 10000),
+                'otherErrors'=>$other_errors,
                 'missingSigns'=>$signs, 'missingTimes'=>$clocks, 'interpreted'=>true,'pendingTimeIds'=>$pending];
+            if (isset($raw['otherPenaltyPoints'])) {
+                $points = self::integer($raw['otherPenaltyPoints'], 0, 6000000);
+                if ($other_errors !== 0 || $points % 100 !== 0) {
+                    throw new InvalidArgumentException('Anna muut virhepisteet 100 pisteen askelin.');
+                }
+                $section_result['otherPenaltyPoints'] = $points;
+            }
+            $sections[] = $section_result;
         }
         if (!$sections) { throw new InvalidArgumentException('Valitse vähintään yksi jakso.'); }
         return ['pairNumber'=>$number, 'sections'=>$sections];
