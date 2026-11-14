@@ -1,0 +1,21 @@
+name: as_tulkki
+description: "AS tulkki – autosuunnistuksen kilpailukorttien tulkkaus ja WordPress-yhteys."
+publish_to: 'none'
+version: 0.2.0+2
+
+environment:
+  sdk: ^3.13.7
+
+dependencies:
+  flutter:
+    sdk: flutter
+  shared_preferences: ^2.5.6
+  http: ^1.6.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true

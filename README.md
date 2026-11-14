@@ -163,6 +163,10 @@ ULA-kenttään voi kirjoittaa 1845 tai 18:45. Muissa aikakentissä muodot ovat 1
 
 ## GitHub-repositorion sisältö
 
-Tässä repositoriossa ovat WordPress-lisäosan PHP-lähdekoodi, testit, esimerkit ja valmis selainversio app/-hakemistossa. Erillinen Flutter/Dart-lähdekoodiprojekti ei sisälly tähän repositorioon. Selainversion mukana toimitetut kolmannen osapuolen lisenssit säilytetään app/assets/NOTICES- ja app/licenses/-tiedostoissa.
+Tässä repositoriossa ovat WordPress-lisäosan PHP-lähdekoodi, testit, esimerkit ja valmis selainversio app/-hakemistossa. Flutter/Dart-lähdekoodiprojekti on as_tulkki/-hakemistossa. Se vastaa aiempaa 0.7.1-kehitysversiota; app/-hakemiston 0.7.2-muutokset on vielä sovitettava Dart-lähteeseen ennen selainversion uudelleenkääntämistä. Selainversion mukana toimitetut kolmannen osapuolen lisenssit säilytetään app/assets/NOTICES- ja app/licenses/-tiedostoissa.
 
 Asennettaessa sijoita koko repositorion sisältö WordPressin wp-content/plugins/as-tulkki-yhteys/-hakemistoon ja aktivoi lisäosa. GitHubin Download ZIP -paketin voi myös purkaa ja nimetä ylähakemiston as-tulkki-yhteys-nimiseksi ennen siirtämistä.
+
+## Flutter-lähdekoodin käyttö
+
+Katso as_tulkki/README.md. Asenna Flutter SDK ja suorita as_tulkki-hakemistossa flutter pub get, flutter analyze ja flutter test. Paikalliset SDK-polut, välimuistit ja build/-hakemisto eivät kuulu versionhallintaan. WordPress-asennukseen tarvitaan vain lisäosa ja app/-hakemisto; Flutter-lähdekansiota ei tarvitse siirtää palvelimelle.

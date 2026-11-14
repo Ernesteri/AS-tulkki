@@ -1,0 +1,19 @@
+{
+    "name": "AS tulkki",
+    "short_name": "AS tulkki",
+    "start_url": ".",
+    "display": "standalone",
+    "background_color": "#F5F7F5",
+    "theme_color": "#145A48",
+    "description": "Kilpailukorttien tulkkauksen paikallinen kokeilu.",
+    "orientation": "portrait-primary",
+    "prefer_related_applications": false,
+    "icons": [
+        {
+            "src": "icons/as-tulkki.svg",
+            "sizes": "any",
+            "type": "image/svg+xml",
+            "purpose": "any"
+        }
+    ]
+}
