@@ -317,6 +317,10 @@ final class AS_Tulkki_Yhteys {
         foreach ($rows as $row) {
             $cursor = (int)$row['id']; $original = json_decode($row['payload'], true);
             $normalized = AS_Tulkki_Data::submission(AS_Tulkki_Data::project_submission($original, $manifest), $manifest,true);
+            if ($identity['owner'] && $request->get_header('x-as-other-penalty-points') !== '1'
+                && array_filter($normalized['sections'], static fn($s) => isset($s['otherPenaltyPoints']))) {
+                return self::error('Tulkinta sisältää suoria virhepisteitä. Päivitä AS2026 versioon 0.7.8 tai uudempaan.', 409);
+            }
             $versions=json_decode($c['manifest_history']??'{}',true)?:[];
             $labels=$original['originalLabels']??AS_Tulkki_Data::labels($versions[$original['sourceRevision']??$original['revision']]??(reset($versions)?:$manifest),$original['originalSections']??$original['sections']);
             $events[] = ['eventId'=>$cursor,'revision'=>(int)$c['revision'],'reviewer'=>$original['reviewer'],'savedAt'=>$original['savedAt'],'originalSections'=>$original['originalSections']??$original['sections'],'originalLabels'=>(object)$labels] + $normalized;

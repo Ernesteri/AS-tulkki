@@ -7754,11 +7754,21 @@ ate(a){var s,r=A.bW("^\\d{6}$",!1)
 if(!r.b.test(a))return a
 s=B.c.S(a,0,2)+":"+B.c.S(a,2,4)+":"+B.c.S(a,4,6)
 return A.ato(s)?s:a},
+ulaTime(value) {
+  if (/^\d{4}$/.test(value)) value = value.slice(0, 2) + ":" + value.slice(2);
+  if (/^\d{2}:\d{2}$/.test(value)) value += ":00";
+  return A.ate(value);
+},
+ulaDisplay(value) {
+  const time = A.ulaTime(value);
+  return A.ato(time) && time.endsWith(":00") ? time.slice(0, 5) : time;
+},
 ayF(a,b){return new A.eR(!1,b)},
 aAA(a){var s,r,q=new A.fw(A.o(t.N,t.T6))
 q.b=A.aP(a.h(0,"note"))
 s=A.bP(a.h(0,"otherErrors"))
 q.c=s
+q.otherPenaltyPoints=a.h(0,"otherPenaltyPoints")==null?null:A.bP(a.h(0,"otherPenaltyPoints"))
 q.d=A.hY(a.h(0,"interpreted"))
 q.e=A.ch(a.h(0,"completedAt"))
 q.f=A.ch(a.h(0,"submissionId"))
@@ -7860,6 +7870,7 @@ fw:function fw(a){var _=this
 _.a=a
 _.b=""
 _.c=0
+_.otherPenaltyPoints=null
 _.d=!1
 _.f=_.e=null
 _.r=!1},
@@ -42392,7 +42403,7 @@ if(k){k=n.h(0,l.a)
 k=!(k==null?new A.eR(!1,""):k).a}else k=!1
 if(k){k=l.a
 j=n.h(0,k)
-p.m(0,k,(j==null?new A.eR(!1,""):j).b)}}return A.an(["id",h,"missingEntryIds",r,"times",p,"note",g.b,"otherErrors",g.c],q,t.K)},
+p.m(0,k,(j==null?new A.eR(!1,""):j).b)}}return A.an(["id",h,"missingEntryIds",r,"times",p,"note",g.b,"otherErrors",g.c,"otherPenaltyPoints",g.otherPenaltyPoints],q,t.K)},
 $S:493}
 A.ags.prototype={
 $1(a){return this.a.Bc(a.a).a},
@@ -42414,7 +42425,7 @@ A.eR.prototype={
 eF(){return A.an(["missing",this.a,"time",this.b],t.N,t.K)}}
 A.fw.prototype={
 gKZ(){var s=this
-return s.a.a!==0||s.b.length!==0||s.c!==0||s.d},
+return s.a.a!==0||s.b.length!==0||s.c!==0||s.otherPenaltyPoints!==null||s.d},
 Bc(a){var s=this.a.h(0,a)
 return s==null?new A.eR(!1,""):s},
 Gs(){var s=this
@@ -42430,7 +42441,7 @@ return new A.aj(s,new A.acC(this),A.V(s).i("aj<1>")).gD(0)},
 aoQ(a){var s=a.c
 return new A.aj(s,new A.acD(this),A.V(s).i("aj<1>")).gD(0)},
 eF(){var s=this,r=t.N
-return A.an(["values",s.a.lD(0,new A.acE(),r,t.nf),"note",s.b,"otherErrors",s.c,"interpreted",s.d,"completedAt",s.e,"submissionId",s.f,"synced",s.r],r,t.X)}}
+return A.an(["values",s.a.lD(0,new A.acE(),r,t.nf),"note",s.b,"otherErrors",s.c,"otherPenaltyPoints",s.otherPenaltyPoints,"interpreted",s.d,"completedAt",s.e,"submissionId",s.f,"synced",s.r],r,t.X)}}
 A.acB.prototype={
 $1(a){var s=this.a.Bc(a.a)
 return a.Jk(this.b)&&!s.a&&!A.ato(s.b)},
@@ -42562,6 +42573,7 @@ b5=A.o(s,n)
 b6=new A.fw(b5)
 b6.b=A.aP(b1.h(0,"note"))
 b6.c=A.bP(b1.h(0,d8))
+b6.otherPenaltyPoints=b1.h(0,"otherPenaltyPoints")==null?null:A.bP(b1.h(0,"otherPenaltyPoints"))
 b6.r=b6.d=!0
 b6.e=A.aP(d.h(0,"savedAt"))
 for(b7=a0.length,e=0;e<a0.length;a0.length===b7||(0,A.t)(a0),++e){b8=a0[e].a
@@ -42585,7 +42597,7 @@ s.E(0,""+A.bP(a4.h(0,d7))+"/"+A.aP(J.b3(a6,d2)))}}for(d9=new A.cK(d9,A.j(d9).i("
 p=a2.a
 c4=r.h(0,p)
 o=!0
-if(!e2.p(0,p))if(!s.p(0,p))if(c4!=null)o=(c4.a.a!==0||c4.b.length!==0||c4.c!==0||c4.d)&&!c4.r
+if(!e2.p(0,p))if(!s.p(0,p))if(c4!=null)o=(c4.a.a!==0||c4.b.length!==0||c4.c!==0||c4.otherPenaltyPoints!==null||c4.d)&&!c4.r
 else o=!1
 if(o)continue
 o=B.ai.i4(c4==null?c8:c4.eF(),c8)
@@ -43128,7 +43140,7 @@ h=A.k(h==null?m.h(0,"id"):h)
 g=j.gD(0)===0?"ei puuttuvia":new A.a2(j,l,j.$ti.i("a2<aE.E,l>")).be(0,", ")
 f.push(h+"\nPuuttuvat: "+g)
 if(i.a!==0){h=A.j(i).i("cK<1,2>")
-f.push("Ajat: "+A.oZ(new A.cK(i,h),new A.a4o(l),h.i("u.E"),r).be(0,", "))}f.push("Muut virheet: "+A.k(m.h(0,"otherErrors")))}return B.b.be(f,"\n")},
+f.push("Ajat: "+A.oZ(new A.cK(i,h),new A.a4o(l),h.i("u.E"),r).be(0,", "))}f.push("Muut virheet: "+(m.h(0,"otherPenaltyPoints")==null?A.k(m.h(0,"otherErrors"))+" kpl":A.k(m.h(0,"otherPenaltyPoints"))+" vp"))}return B.b.be(f,"\n")},
 K(a){return A.fJ(this.c,new A.a4m(this),null)}}
 A.a4n.prototype={
 $1(a){return a.a===this.a.h(0,"id")},
@@ -43271,8 +43283,8 @@ j=h.a.d
 i=o.h(0,k)
 if(i==null)i=new A.eR(!1,"")
 d.push(new A.y5(l,m.a+1,j.d,i,h.d,new A.apB(n,h,a),new A.apC(n,h,a),new A.cZ(k,p)))}d.push(B.cx)
-s=f.c
-d.push(A.I0(new A.bV(B.cq,A.ru(A.c([B.Wb,B.zt,B.Wa,A.jv(A.c([A.yy(g,g,B.Gz,g,g,s===0?g:new A.apD(h,a),g,g,"V\xe4henn\xe4 muu virhe"),A.bJ(""+s,g,g,g,B.TU,g,g),A.yy(g,g,B.Gy,g,g,new A.apE(h,a),g,g,"Lis\xe4\xe4 muu virhe")],e),B.aC,B.al,B.bh,0)],e),B.bn,B.al,B.bh),g),g,g,g))
+s=f.otherPenaltyPoints??f.c*600
+d.push(A.I0(new A.bV(B.cq,A.ru(A.c([B.Wb,B.zt,B.Wa,A.jv(A.c([A.a2a(B.Gz,A.bJ("-100 vp",g,g,g,g,g,g),s===0?g:new A.apD(h,a)),A.bJ(f.otherPenaltyPoints===null&&f.c>0?f.c+" kpl":s+" vp",g,g,g,B.TU,g,g),A.a2a(B.Gy,A.bJ("+100 vp",g,g,g,g,g,g),s>=6000000?g:new A.apE(h,a))],e),B.aC,B.al,B.bh,0)],e),B.bn,B.al,B.bh),g),g,g,g))
 d.push(B.cx)
 return A.ru(d,B.ep,B.al,B.bh)},
 K(a){return A.fJ(this.a.c,new A.apo(this),null)}}
@@ -43321,7 +43333,7 @@ $1(a){return this.b.yz(this.c,new A.apz(this.a,a))},
 $S:44}
 A.apz.prototype={
 $1(a){var s=a.a.b4(this.a.a.a,A.aDx())
-s.b=A.ate(this.b)
+s.b=this.a.a.c===B.ez?A.ulaTime(this.b):A.ate(this.b)
 s.a=!1
 a.Gs()
 return null},
@@ -43330,13 +43342,17 @@ A.apD.prototype={
 $0(){return this.a.yz(this.b,new A.apy())},
 $S:0}
 A.apy.prototype={
-$1(a){return a.c--},
+$1(a){a.otherPenaltyPoints=Math.max(0,(a.otherPenaltyPoints??a.c*600)-100)
+a.c=0
+return null},
 $S:78}
 A.apE.prototype={
 $0(){return this.a.yz(this.b,new A.apx())},
 $S:0}
 A.apx.prototype={
-$1(a){return a.c++},
+$1(a){a.otherPenaltyPoints=Math.min(6000000,(a.otherPenaltyPoints??a.c*600)+100)
+a.c=0
+return null},
 $S:78}
 A.apo.prototype={
 $2(a,b){var s,r,q,p,o=null,n=this.a,m=B.b.lv(n.ghM(),0,new A.apg(n)),l=B.b.lv(n.ghM(),0,new A.aph(n)),k=B.b.lv(n.ghM(),0,new A.api(n)),j=n.a,i=j.d
@@ -43344,7 +43360,7 @@ j=j.f?"Koko kilpailu":j.e.b
 j=A.Yd(o,A.bJ(""+i.a+" \xb7 "+j,o,o,o,o,o,o))
 i=A.c([B.Wc,B.MO,B.cx],t.p)
 for(s=n.ghM(),r=s.length,q=0;q<s.length;s.length===r||(0,A.t)(s),++q)i.push(n.Zp(s[q]))
-i.push(A.bJ("Yhteenveto: "+m+" kilpipuutetta, "+l+" aikapuutetta ja "+k+" muuta virhett\xe4.",o,o,o,o,o,o))
+i.push(A.bJ("Yhteenveto: "+m+" kilpipuutetta, "+l+" aikapuutetta ja "+k+" vp muita virheit\xe4 (vanhat kirjaukset 600 vp/kpl t\xe4ss\xe4 yhteenvedossa).",o,o,o,o,o,o))
 i.push(B.bT)
 s=n.e||n.gzT()?o:n.gajp()
 r=A.K5(n.gzT()?B.od:B.Gk,o,o,o)
@@ -43367,7 +43383,8 @@ A.aph.prototype={
 $2(a,b){return a+this.a.kq(b).aoQ(b)},
 $S:74}
 A.api.prototype={
-$2(a,b){return a+this.a.kq(b).c},
+$2(a,b){var section=this.a.kq(b)
+return a+(section.otherPenaltyPoints??section.c*600)},
 $S:74}
 A.apn.prototype={
 $1(a){if(a.d!==B.f4)A.a2A(this.a).h1()
@@ -43406,6 +43423,7 @@ A.QD.prototype={
 aw(){var s,r,q=this
 q.aQ()
 s=q.a.f.b
+if(q.a.c.c===B.ez)s=A.ulaDisplay(s)
 r=$.al()
 q.d!==$&&A.aT()
 q.d=new A.jE(new A.ce(s,B.dT,B.ax),r)
@@ -43419,7 +43437,7 @@ this.aA()},
 K(a){var s,r,q,p=this,o=null,n=p.a,m=n.f.a,l=n.c.Jk(n.e),k=!1
 if(l)if(!m){if(p.a.r){n=p.d
 n===$&&A.a()
-n=!A.ato(A.ate(n.a.a))}else n=k
+n=!A.ato(p.a.c.c===B.ez?A.ulaTime(n.a.a):A.ate(n.a.a))}else n=k
 k=n}n=m?B.E9:B.k
 s=p.a
 r=t.p
@@ -43427,12 +43445,13 @@ r=A.c([A.jv(A.c([A.hI(A.bJ(""+s.d,o,o,o,B.St,o,o),o,28),A.a1U(A.bJ(s.c.b,o,o,o,B
 if(l){s=p.d
 s===$&&A.a()
 q=A.c([new A.yb(A.bW("[0-9:]",!1),!0,""),new A.Kw(8,o)],t.VS)
-r.push(new A.bV(B.Fn,A.NO(s,A.aut(o,o,o,o,o,o,o,o,!0,o,o,o,o,o,k?"Anna aika hhmmss tai hh:mm:ss tai merkitse puuttuvaksi":o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,"180334 tai 18:03:34",o,o,o,o,o,o,o,o,"Aika",!0,!0,!1,o,o,o,o,o,o,o,o,o,o,o,o,o,o),!m,p.e,q,B.Rx,new A.ak4(p),B.lH,B.lK),o))}return A.I0(new A.bV(B.nG,A.ru(r,B.aC,B.al,B.bh),o),o,n,B.nF)}}
+r.push(new A.bV(B.Fn,A.NO(s,A.aut(o,o,o,o,o,o,o,o,!0,o,o,o,o,o,k?(p.a.c.c===B.ez?"Anna ULA-aika hhmm tai hh:mm tai merkitse puuttuvaksi":"Anna aika hhmmss tai hh:mm:ss tai merkitse puuttuvaksi"):o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,p.a.c.c===B.ez?"1845 tai 18:45":"180334 tai 18:03:34",o,o,o,o,o,o,o,o,"Aika",!0,!0,!1,o,o,o,o,o,o,o,o,o,o,o,o,o,o),!m,p.e,q,B.Rx,new A.ak4(p),B.lH,B.lK),o))}return A.I0(new A.bV(B.nG,A.ru(r,B.aC,B.al,B.bh),o),o,n,B.nF)}}
 A.ak5.prototype={
 $0(){var s,r=this.a
-if(!r.e.gbw()&&!r.a.f.a){r=r.d
+if(!r.e.gbw()&&!r.a.f.a){var ula=r.a.c.c===B.ez
+r=r.d
 r===$&&A.a()
-s=A.ate(r.a.a)
+s=ula?A.ulaDisplay(r.a.a):A.ate(r.a.a)
 if(s!==r.a.a)r.nM(new A.ce(s,A.jF(B.j,s.length),B.ax))}},
 $S:0}
 A.ak3.prototype={
@@ -93243,7 +93262,7 @@ B.W7=new A.cY("Voit my\xf6s kokeilla paikallista esimerkkikilpailua.",null,null,
 B.W8=new A.cY("Koko kilpailu",null,null,null,null,null,null,null,null)
 B.Wa=new A.cY("Ylim\xe4\xe4r\xe4iset AT-, JAT- tai JRT-merkinn\xe4t",null,null,null,null,null,null,null,null)
 B.Sv=new A.m(!0,null,null,null,null,null,17,B.bo,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
-B.Wb=new A.cY("Muut virheet",null,B.Sv,null,null,null,null,null,null)
+B.Wb=new A.cY("Muut virhepisteet",null,B.Sv,null,null,null,null,null,null)
 B.TK=new A.m(!0,null,null,null,null,null,16,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)
 B.Wc=new A.cY("Vertaa korttia oikeaan riviin. Merkitse vain puuttuvat.",null,B.TK,null,null,null,null,null,null)
 B.Uq=new A.m(!0,null,null,null,null,null,18,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null,null)

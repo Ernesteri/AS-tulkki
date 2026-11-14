@@ -2,7 +2,7 @@
 /**
  * Plugin Name: AS tulkki – tiedonsiirto
  * Description: AS2026:n ja AS tulkin kilpailutietojen ja tulkintojen rajapinta.
- * Version: 0.7.1
+ * Version: 0.7.2
  * Requires at least: 6.5
  * Requires PHP: 8.1
  * License: GPL-2.0-or-later
