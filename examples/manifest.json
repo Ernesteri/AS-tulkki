@@ -1,0 +1,22 @@
+{
+  "baseRevision": 0,
+  "manifest": {
+    "routes": [{
+      "id": "r1",
+      "name": "M",
+      "sections": [{
+        "id": "r1-j1",
+        "name": "Jakso 1",
+        "entries": [
+          {"id": "r1-e1", "label": "15", "kind": "rt"},
+          {"id": "r1-e2", "label": "15", "kind": "rt"},
+          {"id": "r1-e3", "label": "AT", "kind": "at", "manualTime": true},
+          {"id": "r1-e4", "label": "JAT", "kind": "jat", "manualTime": false},
+          {"id": "r1-e5", "label": "ULA", "kind": "ula", "manualTime": false},
+          {"id": "r1-e6", "label": "M", "kind": "maali", "manualTime": false}
+        ]
+      }]
+    }],
+    "pairs": [{"number": 101, "driver": "Aino Malli", "navigator": "Eero Esimerkki", "routeId": "r1", "emit": true}]
+  }
+}

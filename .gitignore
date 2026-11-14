@@ -1,0 +1,14 @@
+# Paikalliset asetukset ja salaisuudet
+.env
+.env.*
+!.env.example
+wp-config.php
+*.log
+*.sql
+*.sql.gz
+*.pem
+*.key
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
