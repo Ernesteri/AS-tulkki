@@ -29,7 +29,7 @@ void main() {
     (tester) async {
       final store = MemoryStore();
       final controller = TulkkiController(store);
-      await controller.openDemo('Vanha tarkastaja');
+      await tester.runAsync(() => controller.openDemo('Vanha tarkastaja'));
       final before = controller.competition.encode();
       var cancelled = false;
       await tester.pumpWidget(
@@ -52,8 +52,13 @@ void main() {
       expect(fields[2].controller!.text, 'Vanha tarkastaja');
       expect(controller.competition.encode(), before);
       expect(find.text('Avaa esimerkkikilpailu'), findsNothing);
-      await tester.ensureVisible(find.text('Palaa aiempaan kilpailuun'));
-      await tester.tap(find.text('Palaa aiempaan kilpailuun'));
+      final cancel = find.text('Palaa aiempaan kilpailuun');
+      await tester.scrollUntilVisible(
+        cancel,
+        120,
+        scrollable: find.byType(Scrollable).first,
+      );
+      await tester.tap(cancel);
       expect(cancelled, isTrue);
       expect(controller.competition.encode(), before);
       controller.dispose();
