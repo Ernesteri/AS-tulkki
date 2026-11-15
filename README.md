@@ -1,4 +1,4 @@
-# AS tulkki – tiedonsiirto 0.7.2
+# AS tulkki – tiedonsiirto 0.7.3
 
 WordPress-lisäosa AS2026:n ja AS tulkin väliseen tiedonsiirtoon. Lisäosa käyttää WordPressin nykyistä MySQL-/MariaDB-tietokantaa omilla `as_tulkki_`-tauluillaan ja WordPressin määrittämällä tauluetuliitteellä. Muun autosuunnistussovelluksen tauluja ei muuteta.
 
@@ -6,7 +6,7 @@ WordPress-lisäosa AS2026:n ja AS tulkin väliseen tiedonsiirtoon. Lisäosa käy
 
 ## Asennus ja päivitys
 
-1. WordPress → Lisäosat → Lisää uusi lisäosa → Lataa lisäosa. Valitse `as-tulkki-yhteys-0.7.2.zip`.
+1. WordPress → Lisäosat → Lisää uusi lisäosa → Lataa lisäosa. Valitse `as-tulkki-yhteys-0.7.3.zip`.
 2. Jos aiempi versio on asennettu, hyväksy sen korvaaminen uudella versiolla. Älä poista kilpailuaineistoa. Aktivoi lisäosa tarvittaessa.
 3. Lisäosan omiin asetuksiin ei syötetä mitään. Aiempi AS tulkki -hallintavalikko poistuu; vanhat kilpailut ja tulkinnat säilyvät. Tietokantarakenne päivittyy automaattisesti.
 
@@ -14,7 +14,11 @@ Tarvitaan PHP 8.1+, WordPress 6.5+, HTTPS ja InnoDB. Verkkotason multisite-aktiv
 
 AS2026:n yhteysnäkymä hoitaa sivuston osoitteen, kilpailun luonnin, kilpailutiedot ja liittymiskoodin näyttämisen. AS2026:ssa voidaan avata ja sulkea puhelinyhteys sekä vaihtaa liittymiskoodi. Hallinta vaatii ylläpitäjän sovellussalasanan; toiminnot katkaisevat puhelinistunnot ja tarkastajat liittyvät uudelleen. Kilpailun tietoja ei syötetä kahteen paikkaan.
 
-## Uutta versiossa 0.7.2
+## Uutta versiossa 0.7.3
+
+Tulkintojen nouto jatkuu, jos aiempi selainversio lähetti tyhjän virhepistekentän. Palvelin jättää kentän pois muutossyötteestä, kun sillä ei ole arvoa. Selainversio rakennetaan repositorion Flutter-lähteestä.
+
+## Versiossa 0.7.2 toteutettu
 
 ULA-ajan voi antaa muodossa 1845 tai 18:45. Muut virhepisteet kirjataan 100 vp:n askelin. Käytä AS2026-versiota 0.7.8 tai uudempaa suorien pisteiden vastaanottoon.
 
@@ -163,7 +167,7 @@ ULA-kenttään voi kirjoittaa 1845 tai 18:45. Muissa aikakentissä muodot ovat 1
 
 ## GitHub-repositorion sisältö
 
-Tässä repositoriossa ovat WordPress-lisäosan PHP-lähdekoodi, testit, esimerkit ja valmis selainversio app/-hakemistossa. Flutter/Dart-lähdekoodiprojekti on as_tulkki/-hakemistossa. Se vastaa aiempaa 0.7.1-kehitysversiota; app/-hakemiston 0.7.2-muutokset on vielä sovitettava Dart-lähteeseen ennen selainversion uudelleenkääntämistä. Selainversion mukana toimitetut kolmannen osapuolen lisenssit säilytetään app/assets/NOTICES- ja app/licenses/-tiedostoissa.
+Tässä repositoriossa ovat WordPress-lisäosan PHP-lähdekoodi, testit, esimerkit ja valmis selainversio app/-hakemistossa. Flutter/Dart-lähdekoodiprojekti on as_tulkki/-hakemistossa. Selainversion mukana toimitetut kolmannen osapuolen lisenssit säilytetään app/assets/NOTICES- ja app/licenses/-tiedostoissa.
 
 Asennettaessa sijoita koko repositorion sisältö WordPressin wp-content/plugins/as-tulkki-yhteys/-hakemistoon ja aktivoi lisäosa. GitHubin Download ZIP -paketin voi myös purkaa ja nimetä ylähakemiston as-tulkki-yhteys-nimiseksi ennen siirtämistä.
 

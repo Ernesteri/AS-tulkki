@@ -323,7 +323,10 @@ final class AS_Tulkki_Yhteys {
             }
             $versions=json_decode($c['manifest_history']??'{}',true)?:[];
             $labels=$original['originalLabels']??AS_Tulkki_Data::labels($versions[$original['sourceRevision']??$original['revision']]??(reset($versions)?:$manifest),$original['originalSections']??$original['sections']);
-            $events[] = ['eventId'=>$cursor,'revision'=>(int)$c['revision'],'reviewer'=>$original['reviewer'],'savedAt'=>$original['savedAt'],'originalSections'=>$original['originalSections']??$original['sections'],'originalLabels'=>(object)$labels] + $normalized;
+            $original_sections = AS_Tulkki_Data::omit_empty_penalty_points(
+                $original['originalSections'] ?? $original['sections']
+            );
+            $events[] = ['eventId'=>$cursor,'revision'=>(int)$c['revision'],'reviewer'=>$original['reviewer'],'savedAt'=>$original['savedAt'],'originalSections'=>$original_sections,'originalLabels'=>(object)$labels] + $normalized;
         }
         return ['events'=>$events,'nextCursor'=>$cursor,'hasMore'=>$more,'revision'=>(int)$c['revision'],'manifest'=>$manifest];
     }

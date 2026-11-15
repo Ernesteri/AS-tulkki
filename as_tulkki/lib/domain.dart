@@ -86,7 +86,14 @@ bool validClock(String text) {
   return parts[0] < 24 && parts[1] < 60 && parts[2] < 60;
 }
 
-String normalizeClockInput(String text) {
+String normalizeClockInput(String text, {bool ula = false}) {
+  if (ula && RegExp(r'^\d{4}$').hasMatch(text)) {
+    text = '${text.substring(0, 2)}:${text.substring(2)}';
+  }
+  if (ula && RegExp(r'^\d{2}:\d{2}$').hasMatch(text)) {
+    final formatted = '$text:00';
+    return validClock(formatted) ? formatted : text;
+  }
   if (!RegExp(r'^\d{6}$').hasMatch(text)) return text;
   final formatted =
       '${text.substring(0, 2)}:${text.substring(2, 4)}:${text.substring(4, 6)}';
@@ -108,12 +115,38 @@ class SectionDraft {
   final Map<String, EntryValue> values = {};
   String note = '';
   int otherErrors = 0;
+  int? otherPenaltyPoints;
+  static const maxOtherPenaltyPoints = 6000000;
+  int get displayedPenaltyPoints => otherPenaltyPoints ?? otherErrors * 600;
+  void adjustOtherPenaltyPoints(int change) {
+    otherPenaltyPoints = (displayedPenaltyPoints + change).clamp(
+      0,
+      maxOtherPenaltyPoints,
+    );
+    otherErrors = 0;
+  }
+
+  bool get validOtherErrors {
+    final points = otherPenaltyPoints;
+    return otherErrors >= 0 &&
+        otherErrors <= 10000 &&
+        (points == null ||
+            (otherErrors == 0 &&
+                points >= 0 &&
+                points <= maxOtherPenaltyPoints &&
+                points % 100 == 0));
+  }
+
   bool interpreted = false;
   String? completedAt;
   String? submissionId;
   bool synced = false;
   bool get started =>
-      values.isNotEmpty || note.isNotEmpty || otherErrors != 0 || interpreted;
+      values.isNotEmpty ||
+      note.isNotEmpty ||
+      otherErrors != 0 ||
+      otherPenaltyPoints != null ||
+      interpreted;
   EntryValue value(String id) => values[id] ?? EntryValue();
   void changed() {
     interpreted = false;
@@ -129,9 +162,9 @@ class SectionDraft {
     changed();
   }
 
-  void setTime(String id, String time) {
+  void setTime(String id, String time, {bool ula = false}) {
     final entry = values.putIfAbsent(id, EntryValue.new);
-    entry.time = normalizeClockInput(time);
+    entry.time = normalizeClockInput(time, ula: ula);
     entry.missing = false;
     changed();
   }
@@ -159,6 +192,7 @@ class SectionDraft {
     'values': values.map((id, value) => MapEntry(id, value.toJson())),
     'note': note,
     'otherErrors': otherErrors,
+    'otherPenaltyPoints': ?otherPenaltyPoints,
     'interpreted': interpreted,
     'completedAt': completedAt,
     'submissionId': submissionId,
@@ -168,11 +202,12 @@ class SectionDraft {
     final draft = SectionDraft()
       ..note = json['note'] as String
       ..otherErrors = json['otherErrors'] as int
+      ..otherPenaltyPoints = json['otherPenaltyPoints'] as int?
       ..interpreted = json['interpreted'] as bool
       ..completedAt = json['completedAt'] as String?;
     draft.submissionId = json['submissionId'] as String?;
     draft.synced = json['synced'] as bool? ?? false;
-    if (draft.otherErrors < 0) {
+    if (!draft.validOtherErrors) {
       throw const FormatException('Virheellinen virhemäärä');
     }
     (json['values'] as Map<String, dynamic>).forEach((id, value) {
@@ -408,9 +443,15 @@ class LocalCompetition {
         final draft = SectionDraft()
           ..note = data['note'] as String
           ..otherErrors = data['otherErrors'] as int
+          ..otherPenaltyPoints = data['otherPenaltyPoints'] as int?
           ..interpreted = true
           ..synced = true
           ..completedAt = event['savedAt'] as String;
+        if (!draft.validOtherErrors) {
+          throw const FormatException(
+            'Palvelimen virhepisteitä ei tunnistettu',
+          );
+        }
         for (final entry in section.entries) {
           if (missing.contains(entry.id) || times.containsKey(entry.id)) {
             draft.values[entry.id] = EntryValue(

@@ -18,6 +18,36 @@ class MemoryStore implements DraftStore {
 }
 
 void main() {
+  test('ULA hyväksyy minuutit ja säilyttää sekunnit vanhoissa ajoissa', () {
+    final draft = SectionDraft();
+    for (final input in ['1845', '18:45']) {
+      draft.setTime('ula', input, ula: true);
+      expect(draft.value('ula').time, '18:45:00');
+    }
+    draft.setTime('ula', '18:45:33', ula: true);
+    expect(draft.value('ula').time, '18:45:33');
+    expect(validClock(normalizeClockInput('2460', ula: true)), isFalse);
+    expect(validClock(normalizeClockInput('1845')), isFalse);
+  });
+
+  test('Pistekenttä jää pois ilman kirjausta ja kirjattu nolla säilyy', () {
+    final draft = SectionDraft();
+    expect(draft.toJson().containsKey('otherPenaltyPoints'), isFalse);
+    final old = SectionDraft.fromJson({
+      ...draft.toJson(),
+      'otherPenaltyPoints': null,
+    });
+    expect(old.toJson().containsKey('otherPenaltyPoints'), isFalse);
+    for (var i = 0; i < 3; i++) {
+      draft.adjustOtherPenaltyPoints(100);
+    }
+    expect(draft.otherPenaltyPoints, 300);
+    draft.adjustOtherPenaltyPoints(-300);
+    final reopened = SectionDraft.fromJson(draft.toJson());
+    expect(reopened.otherPenaltyPoints, 0);
+    expect(reopened.otherErrors, 0);
+  });
+
   test('Asemakohtainen ajan syöttötapa ohittaa Emit-oletuksen', () {
     const automaticAt = RouteEntry('a', 'AT', EntryKind.at, manualTime: false);
     const manualJat = RouteEntry('j', 'JAT', EntryKind.jat, manualTime: true);
