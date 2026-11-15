@@ -61,6 +61,15 @@ $direct['sections'][1]['otherErrors'] = 2;
 $result = AS_Tulkki_Data::submission($direct, $manifest);
 check($result['sections'][0]['otherPenaltyPoints'] === 300, 'Suorat pisteet säilyvät.');
 check($result['sections'][1]['otherErrors'] === 2 && !isset($result['sections'][1]['otherPenaltyPoints']), 'Vanha jakso säilyy kappalemääränä.');
+$old_history = [
+    ['id'=>'j1', 'otherPenaltyPoints'=>null, 'otherErrors'=>0],
+    ['id'=>'j2', 'otherPenaltyPoints'=>0, 'otherErrors'=>0],
+    ['id'=>'j3', 'otherPenaltyPoints'=>300, 'otherErrors'=>0],
+    ['id'=>'j4', 'otherErrors'=>2],
+];
+$history = AS_Tulkki_Data::omit_empty_penalty_points($old_history);
+check(!array_key_exists('otherPenaltyPoints', $history[0]), 'Vanhan tapahtuman null poistetaan muutossyötteestä.');
+check($history[1] === $old_history[1] && $history[2] === $old_history[2] && $history[3] === $old_history[3], 'Nolla, pisteet ja vanha kappalemäärä säilyvät.');
 $direct['sections'][0]['otherPenaltyPoints'] = 350;
 rejects(fn()=>AS_Tulkki_Data::submission($direct,$manifest), 'Pisteet annetaan sadan askelin.');
 $direct['sections'][0]['otherPenaltyPoints'] = 0;

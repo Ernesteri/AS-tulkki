@@ -36,7 +36,9 @@ void main() {
     expect(controller.competition.draft(101, 'j1').value('j1-2').missing, true);
     expect(tester.takeException(), isNull);
     await tester.pumpWidget(const SizedBox.shrink());
-    await tester.runAsync(controller.flush);
+    // Luonnoksen tallennus käynnistyi testin virtuaalikellolla.
+    await tester.pump(const Duration(milliseconds: 10));
+    await controller.flush();
     final restored = TulkkiController(store);
     await tester.runAsync(restored.load);
     expect(restored.competition.draft(101, 'j1').value('j1-2').missing, true);

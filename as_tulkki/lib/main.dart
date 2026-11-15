@@ -660,7 +660,12 @@ class InterpretationHistory extends StatelessWidget {
         lines.add(
           'Ajat: ${times.entries.map((e) => '${label(e.key)} ${e.value}').join(', ')}',
         );
-      lines.add('Muut virheet: ${data['otherErrors']}');
+      final points = data['otherPenaltyPoints'];
+      lines.add(
+        points == null
+            ? 'Muut virheet: ${data['otherErrors']} kpl'
+            : 'Muut virhepisteet: $points vp',
+      );
     }
     return lines.join('\n');
   }
@@ -950,7 +955,11 @@ class _SectionScreenState extends State<SectionScreen> {
             showErrors: showErrors,
             onMissing: (missing) =>
                 change(section, (d) => d.setMissing(entry.id, missing)),
-            onTime: (time) => change(section, (d) => d.setTime(entry.id, time)),
+            onTime: (time) => change(
+              section,
+              (d) =>
+                  d.setTime(entry.id, time, ula: entry.kind == EntryKind.ula),
+            ),
           ),
         const SizedBox(height: 16),
         Card(
@@ -960,31 +969,43 @@ class _SectionScreenState extends State<SectionScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  'Muut virheet',
+                  'Muut virhepisteet',
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 17),
                 ),
                 const SizedBox(height: 6),
                 const Text('Ylimääräiset AT-, JAT- tai JRT-merkinnät'),
-                Row(
+                Wrap(
+                  spacing: 8,
+                  crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
-                    IconButton(
-                      tooltip: 'Vähennä muu virhe',
-                      onPressed: draft.otherErrors == 0
+                    OutlinedButton(
+                      onPressed: draft.displayedPenaltyPoints == 0
                           ? null
-                          : () => change(section, (d) => d.otherErrors--),
-                      icon: const Icon(Icons.remove_circle_outline),
+                          : () => change(
+                              section,
+                              (d) => d.adjustOtherPenaltyPoints(-100),
+                            ),
+                      child: const Text('−100 vp'),
                     ),
                     Text(
-                      '${draft.otherErrors}',
+                      draft.otherPenaltyPoints == null && draft.otherErrors > 0
+                          ? '${draft.otherErrors} kpl'
+                          : '${draft.displayedPenaltyPoints} vp',
                       style: const TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    IconButton(
-                      tooltip: 'Lisää muu virhe',
-                      onPressed: () => change(section, (d) => d.otherErrors++),
-                      icon: const Icon(Icons.add_circle_outline),
+                    OutlinedButton(
+                      onPressed:
+                          draft.displayedPenaltyPoints >=
+                              SectionDraft.maxOtherPenaltyPoints
+                          ? null
+                          : () => change(
+                              section,
+                              (d) => d.adjustOtherPenaltyPoints(100),
+                            ),
+                      child: const Text('+100 vp'),
                     ),
                   ],
                 ),
@@ -1009,7 +1030,12 @@ class _SectionScreenState extends State<SectionScreen> {
         0,
         (sum, s) => sum + draftFor(s).missingTimes(s),
       );
-      final other = sections.fold(0, (sum, s) => sum + draftFor(s).otherErrors);
+      final count = sections.fold(0, (sum, s) => sum + draftFor(s).otherErrors);
+      final points = sections.fold(
+        0,
+        (sum, s) => sum + (draftFor(s).otherPenaltyPoints ?? 0),
+      );
+      final other = count > 0 ? '$points vp ja $count kpl' : '$points vp';
       return Scaffold(
         appBar: AppBar(
           title: Text(
@@ -1041,7 +1067,7 @@ class _SectionScreenState extends State<SectionScreen> {
                   const SizedBox(height: 16),
                   for (final section in sections) sectionEditor(section),
                   Text(
-                    'Yhteenveto: $missingSigns kilpipuutetta, $missingTimes aikapuutetta ja $other muuta virhettä.',
+                    'Yhteenveto: $missingSigns kilpipuutetta, $missingTimes aikapuutetta. Muut virheet: $other.',
                   ),
                   const SizedBox(height: 12),
                   FilledButton.icon(
@@ -1136,13 +1162,23 @@ class EntryTile extends StatefulWidget {
 class _EntryTileState extends State<EntryTile> {
   late final TextEditingController time;
   final clockFocus = FocusNode();
+  bool get ula => widget.entry.kind == EntryKind.ula;
+
+  String displayClock(String value) {
+    final formatted = normalizeClockInput(value, ula: ula);
+    if (ula && validClock(formatted) && formatted.endsWith(':00')) {
+      return formatted.substring(0, 5);
+    }
+    return formatted;
+  }
+
   @override
   void initState() {
     super.initState();
-    time = TextEditingController(text: widget.value.time);
+    time = TextEditingController(text: displayClock(widget.value.time));
     clockFocus.addListener(() {
       if (!clockFocus.hasFocus && !widget.value.missing) {
-        final formatted = normalizeClockInput(time.text);
+        final formatted = displayClock(time.text);
         if (formatted != time.text) {
           time.value = TextEditingValue(
             text: formatted,
@@ -1168,7 +1204,7 @@ class _EntryTileState extends State<EntryTile> {
         clock &&
         !missing &&
         widget.showErrors &&
-        !validClock(normalizeClockInput(time.text));
+        !validClock(normalizeClockInput(time.text, ula: ula));
     return Card(
       color: missing ? const Color(0xFFFFE3DF) : Colors.white,
       margin: const EdgeInsets.only(bottom: 10),
@@ -1220,9 +1256,11 @@ class _EntryTileState extends State<EntryTile> {
                   ],
                   decoration: InputDecoration(
                     labelText: 'Aika',
-                    hintText: '180334 tai 18:03:34',
+                    hintText: ula ? '1845 tai 18:45' : '180334 tai 18:03:34',
                     errorText: invalid
-                        ? 'Anna aika hhmmss tai hh:mm:ss tai merkitse puuttuvaksi'
+                        ? (ula
+                              ? 'Anna ULA-aika hhmm tai hh:mm tai merkitse puuttuvaksi'
+                              : 'Anna aika hhmmss tai hh:mm:ss tai merkitse puuttuvaksi')
                         : null,
                   ),
                   onChanged: (value) {

@@ -1,6 +1,4 @@
-> Lähteen tilanne: tämä Flutter-projekti vastaa paikallista 0.7.1-kehitysversiota. Repositorion app/-hakemistossa on erikseen päivitetty 0.7.2-selainversio (ULA minuuteissa ja suorat muut virhepisteet). Näitä 0.7.2-muutoksia ei ole tässä Dart-lähteessä. Älä korvaa nykyistä app/-hakemistoa tämän lähteen käännöksellä ennen muutosten sovittamista.
-
-# AS tulkki 0.7 – selainversio ja Android-lähde
+# AS tulkki 0.7.3 – selainversio ja Android-lähde
 
 Flutter/Dart-sovellus autosuunnistuksen paperikorttien tulkkaukseen. Selainversio liittyy WordPressin AS tulkki -lisäosaan 0.7.1 tai uudempaan liittymiskoodilla ja tarkastajan nimellä. Android-lähde käyttää samaa rajapintaa; tässä työvaiheessa toimitetaan selainversio ilman APK:ta.
 

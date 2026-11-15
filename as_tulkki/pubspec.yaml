@@ -1,7 +1,7 @@
 name: as_tulkki
 description: "AS tulkki – autosuunnistuksen kilpailukorttien tulkkaus ja WordPress-yhteys."
 publish_to: 'none'
-version: 0.2.0+2
+version: 0.7.3+3
 
 environment:
   sdk: ^3.13.7

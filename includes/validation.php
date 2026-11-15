@@ -1,6 +1,16 @@
 <?php
 /** Rajapinnan tietomalli. Ei WordPress-riippuvuuksia: testattavissa PHP CLI:llä. */
 final class AS_Tulkki_Data {
+    /** Poistaa 0.7.2-selaimen tyhjän valinnaisen kentän myös vanhoista tapahtumista. */
+    public static function omit_empty_penalty_points(array $sections): array {
+        foreach ($sections as &$section) {
+            if (($section['otherPenaltyPoints'] ?? null) === null) {
+                unset($section['otherPenaltyPoints']);
+            }
+        }
+        return $sections;
+    }
+
     public static function compatible_row_change(array $old,array $new): bool {
         foreach ($old['pairs'] as $i=>&$pair) { if(isset($new['pairs'][$i]['className'])){$pair['className']=$new['pairs'][$i]['className'];} } unset($pair);
         foreach($old['routes'] as $ri=>&$route){foreach($route['sections'] as $si=>&$section){

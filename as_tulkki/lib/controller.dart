@@ -207,6 +207,7 @@ class TulkkiController extends ChangeNotifier {
             },
             'note': draft.note,
             'otherErrors': draft.otherErrors,
+            'otherPenaltyPoints': ?draft.otherPenaltyPoints,
           };
         }).toList(),
       };
