@@ -18,6 +18,64 @@ class MemoryStore implements DraftStore {
 }
 
 void main() {
+  test(
+    'Ajan syöttö käsin ja siirtyminen paperiin säilyttävät ratakohdistuksen',
+    () {
+      Map<String, dynamic> manifest(bool manual, bool emit) => {
+        'routes': [
+          {
+            'id': 'r1',
+            'sections': [
+              {
+                'id': 's1',
+                'entries': [
+                  {
+                    'id': 'ula',
+                    'label': 'ULA',
+                    'kind': 'ula',
+                    'manualTime': manual,
+                    'voided': false,
+                  },
+                ],
+              },
+            ],
+          },
+        ],
+        'pairs': [
+          {'number': 7, 'routeId': 'r1', 'emit': emit},
+        ],
+      };
+      final old = manifest(false, true);
+      final next = manifest(true, true);
+      next['routes'][0]['sections'][0]['entries'][0] = {
+        'voided': false,
+        'kind': 'ula',
+        'label': 'ULA',
+        'id': 'ula',
+        'manualTime': true,
+      };
+      expect(compatibleRowChange(old, next), true);
+      expect(compatibleRowChange(next, old), false);
+      expect(compatibleRowChange(old, manifest(true, false)), true);
+      final moved = manifest(true, false);
+      moved['pairs'][0]['routeId'] = 'other';
+      expect(compatibleRowChange(old, moved), false);
+      expect(
+        sameJsonValue(
+          {
+            'a': 1,
+            'b': [2, 3],
+          },
+          {
+            'b': [2, 3],
+            'a': 1,
+          },
+        ),
+        true,
+      );
+      expect(sameJsonValue([1, 2], [2, 1]), false);
+    },
+  );
   test('ULA hyväksyy minuutit ja säilyttää sekunnit vanhoissa ajoissa', () {
     final draft = SectionDraft();
     for (final input in ['1845', '18:45']) {

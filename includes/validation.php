@@ -12,13 +12,20 @@ final class AS_Tulkki_Data {
     }
 
     public static function compatible_row_change(array $old,array $new): bool {
+        foreach ($old['pairs'] as $i=>&$pair) {
+            if($pair['emit']===true && ($new['pairs'][$i]['emit']??null)===false){$pair['emit']=false;}
+        } unset($pair);
         foreach ($old['pairs'] as $i=>&$pair) { if(isset($new['pairs'][$i]['className'])){$pair['className']=$new['pairs'][$i]['className'];} } unset($pair);
         foreach($old['routes'] as $ri=>&$route){foreach($route['sections'] as $si=>&$section){
             $next=$new['routes'][$ri]['sections'][$si]['entries']??null;if(!is_array($next)){return false;}
             $clocks=static fn($ee)=>array_values(array_filter($ee,static fn($e)=>self::clock($e['kind'])));
             $old_clocks=$clocks($section['entries']);$ids=array_column($old_clocks,'id');
             $retained=array_values(array_filter($clocks($next),static fn($e)=>$e['kind']!=='ula'||in_array($e['id'],$ids,true)));
-            if($old_clocks!==$retained){return false;}
+            if(count($old_clocks)!==count($retained)){return false;}
+            foreach($old_clocks as $i=>$clock){
+                if(($retained[$i]['manualTime']??null)===true){$clock['manualTime']=true;}
+                if($clock!==$retained[$i]){return false;}
+            }
             foreach($next as $i=>$e){if($e['kind']==='ula' && !in_array($e['id'],$ids,true) && ($i===0 || $next[$i-1]['kind']!=='jat' || ($next[$i+1]['kind']??null)==='ula')){return false;}}
             foreach($section['entries'] as $entry){
                 $same=null;foreach($next as $e){if($e['id']===$entry['id']){$same=$e;break;}}
@@ -239,7 +246,7 @@ final class AS_Tulkki_Data {
                     (in_array($entry['kind'], ['at','jat'], true) || !$pair['emit']));
                 if ($time !== null && !$manual) { throw new InvalidArgumentException('Asemalla ei käytetä ajan syöttöä käsin.'); }
                 if ($manual && !$absent && $time === null) {
-                    if($allow_pending && $entry['kind']==='ula'){$pending[]=$id;}
+                    if($allow_pending){$pending[]=$id;}
                     else{throw new InvalidArgumentException('Täydennä ajat tai merkitse ne puuttuviksi.');}
                 }
                 if ($absent) { if ($clock) { $clocks++; } else { $signs++; } }
