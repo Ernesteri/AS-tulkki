@@ -218,6 +218,23 @@ class SectionDraft {
   SectionDraft();
 }
 
+bool sameJsonValue(Object? a, Object? b) {
+  if (a is Map && b is Map) {
+    return a.length == b.length &&
+        a.keys.every(
+          (key) => b.containsKey(key) && sameJsonValue(a[key], b[key]),
+        );
+  }
+  if (a is List && b is List) {
+    return a.length == b.length &&
+        List.generate(
+          a.length,
+          (i) => i,
+        ).every((i) => sameJsonValue(a[i], b[i]));
+  }
+  return a == b;
+}
+
 bool compatibleRowChange(
   Map<String, dynamic> old,
   Map<String, dynamic> incoming,
@@ -227,6 +244,10 @@ bool compatibleRowChange(
     for (var i = 0; i < (expected['pairs'] as List).length; i++) {
       final name = incoming['pairs'][i]['className'];
       if (name != null) expected['pairs'][i]['className'] = name;
+      if (expected['pairs'][i]['emit'] == true &&
+          incoming['pairs'][i]['emit'] == false) {
+        expected['pairs'][i]['emit'] = false;
+      }
     }
     bool clock(dynamic e) => ['at', 'jat', 'ula', 'maali'].contains(e['kind']);
     for (var ri = 0; ri < (expected['routes'] as List).length; ri++) {
@@ -241,7 +262,13 @@ bool compatibleRowChange(
             .where(clock)
             .where((e) => e['kind'] != 'ula' || clockIds.contains(e['id']))
             .toList();
-        if (jsonEncode(oldClocks) != jsonEncode(retained)) return false;
+        if (oldClocks.length != retained.length) return false;
+        for (var i = 0; i < oldClocks.length; i++) {
+          final expectedClock = Map<String, dynamic>.from(oldClocks[i] as Map);
+          if (retained[i]['manualTime'] == true)
+            expectedClock['manualTime'] = true;
+          if (!sameJsonValue(expectedClock, retained[i])) return false;
+        }
         for (var i = 0; i < after.length; i++) {
           if (after[i]['kind'] == 'ula' &&
               !clockIds.contains(after[i]['id']) &&
@@ -260,7 +287,7 @@ bool compatibleRowChange(
         section['entries'] = after;
       }
     }
-    return jsonEncode(expected) == jsonEncode(incoming);
+    return sameJsonValue(expected, incoming);
   } catch (_) {
     return false;
   }
@@ -471,7 +498,7 @@ class LocalCompetition {
             !pending.containsAll(incomplete) ||
             pending.any(
               (id) => !section.entries.any(
-                (e) => e.id == id && e.kind == EntryKind.ula,
+                (e) => e.id == id && e.requiresTime(pair.emit),
               ),
             ))
           throw const FormatException('Palvelimen tulkinnan ajat puuttuvat');

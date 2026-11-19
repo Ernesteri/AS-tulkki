@@ -108,4 +108,16 @@ check(!in_array('new-ula',$pending['sections'][0]['missingEntryIds'],true),'ULA 
 rejects(fn()=>AS_Tulkki_Data::submission($body,$with_ula),'Uusi tulkkaus vaatii ULA-ajan tai puuttumismerkinnän.');
 $completed=$body;$completed['sections'][0]['times']['new-ula']='12:12:00';
 check(AS_Tulkki_Data::submission($completed,$with_ula)['sections'][0]['pendingTimeIds']===[],'Täydennetty ULA-aika valmistuu.');
+
+$manual=$manifest;
+foreach($manual['routes'][0]['sections'][0]['entries'] as &$entry){if($entry['id']==='e4'){$entry['manualTime']=true;}}unset($entry);
+check(AS_Tulkki_Data::compatible_row_change($manifest,$manual),'JAT:n käsin syöttö otetaan käyttöön kesken kilpailun.');
+check(!AS_Tulkki_Data::compatible_row_change($manual,$manifest),'Kirjattujen käsiaikojen merkitystä ei poisteta.');
+$previous=$body;$previous['sections'][0]['missingEntryIds']=['e2'];
+$updated=AS_Tulkki_Data::submission($previous,$manual,true);
+check($updated['sections'][0]['pendingTimeIds']===['e4'],'Vanhan JAT:n uusi aika jää täydennettäväksi.');
+check($updated['sections'][0]['missingEntryIds']===['e2'] && ((array)$updated['sections'][0]['times'])['e3']==='12:34:03','Aiemmat ajat ja RT-puutteet säilyvät.');
+rejects(fn()=>AS_Tulkki_Data::submission($previous,$manual),'Uusi tulkkaus vaatii uuden käsiajan tai puuttumismerkinnän.');
+$paper=$manual;foreach($paper['pairs'] as &$pair){$pair['emit']=false;}unset($pair);
+check(AS_Tulkki_Data::compatible_row_change($manifest,$paper),'Emitistä paperiaikoihin siirrytään säilyttäen kohdistus.');
 echo "Yhteensä $checks tarkistusta läpäisty.\n";

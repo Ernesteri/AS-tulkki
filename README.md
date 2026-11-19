@@ -1,4 +1,4 @@
-# AS tulkki – tiedonsiirto 0.7.3
+# AS tulkki – tiedonsiirto 0.7.5
 
 WordPress-lisäosa AS2026:n ja AS tulkin väliseen tiedonsiirtoon. Lisäosa käyttää WordPressin nykyistä MySQL-/MariaDB-tietokantaa omilla `as_tulkki_`-tauluillaan ja WordPressin määrittämällä tauluetuliitteellä. Muun autosuunnistussovelluksen tauluja ei muuteta.
 
@@ -6,13 +6,17 @@ WordPress-lisäosa AS2026:n ja AS tulkin väliseen tiedonsiirtoon. Lisäosa käy
 
 ## Asennus ja päivitys
 
-1. WordPress → Lisäosat → Lisää uusi lisäosa → Lataa lisäosa. Valitse `as-tulkki-yhteys-0.7.3.zip`.
+1. WordPress → Lisäosat → Lisää uusi lisäosa → Lataa lisäosa. Valitse `as-tulkki-yhteys-0.7.5.zip`.
 2. Jos aiempi versio on asennettu, hyväksy sen korvaaminen uudella versiolla. Älä poista kilpailuaineistoa. Aktivoi lisäosa tarvittaessa.
 3. Lisäosan omiin asetuksiin ei syötetä mitään. Aiempi AS tulkki -hallintavalikko poistuu; vanhat kilpailut ja tulkinnat säilyvät. Tietokantarakenne päivittyy automaattisesti.
 
 Tarvitaan PHP 8.1+, WordPress 6.5+, HTTPS ja InnoDB. Verkkotason multisite-aktivointia ei tueta.
 
 AS2026:n yhteysnäkymä hoitaa sivuston osoitteen, kilpailun luonnin, kilpailutiedot ja liittymiskoodin näyttämisen. AS2026:ssa voidaan avata ja sulkea puhelinyhteys sekä vaihtaa liittymiskoodi. Hallinta vaatii ylläpitäjän sovellussalasanan; toiminnot katkaisevat puhelinistunnot ja tarkastajat liittyvät uudelleen. Kilpailun tietoja ei syötetä kahteen paikkaan.
+
+## Uutta versiossa 0.7.5
+
+Ajan syöttö käsin voidaan ottaa käyttöön julkaistun kilpailun aika-asemalle. Aiemmat tulkkaukset ja ajat säilyvät; uusi aika jää täydennettäväksi ilman puuttumisvirhettä. JSON-olioiden kenttäjärjestys ei aiheuta virheellistä uudelleenliittymispyyntöä. Mukana ovat myös version 0.7.3 tyhjien virhepistekenttien korjaukset. AS2026 0.7.11 tukee puhelinaikoihin perustuvia väliaikatuloksia Emit-kilpailussa.
 
 ## Uutta versiossa 0.7.3
 

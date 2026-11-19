@@ -42,6 +42,6 @@ _flutter.buildConfig = {"engineRevision":"89c39edfdfae2949f6806e4a315c0c08522238
 
 
 for (const build of _flutter.buildConfig.builds) {
-  if (build.mainJsPath) build.mainJsPath = build.mainJsPath.split('?')[0] + '?v=0.7.3';
+  if (build.mainJsPath) build.mainJsPath = build.mainJsPath.split('?')[0] + '?v=0.7.5';
 }
 _flutter.loader.load();
